@@ -3,6 +3,7 @@ import {BrowserRouter as Router, Route, Redirect, Switch} from 'react-router-dom
 
 import Users from './users/pages/Users'
 import NewPlace from './places/pages/NewPlace'
+import UserPlaces from './places/pages/UserPlaces'
 import MainNavigation from './shared/components/Navigation/MainNavigation';
 
 //Switch is like an if statement that only evaluations one of the routes
@@ -14,6 +15,9 @@ function App() {
         <Switch>
           <Route path="/" exact>
             <Users />
+          </Route>
+          <Route path="/:userId/places" exact>
+            <UserPlaces />
           </Route>
           <Route path="/places/new" exact>
             <NewPlace />
