@@ -25,7 +25,7 @@ function MainNavigation(props) {
       //Backdrop is a fullscreen background that sits behind the drawer
       //Aim is that if background clicked, it will close drawer
       {drawerIsOpen && <Backdrop onClick={closeDrawer} /> }
-      <SideDrawer show={drawerIsOpen}>
+      <SideDrawer show={drawerIsOpen} onClick={closeDrawer}>
         <nav className="main-navigation__drawer-nav">
           <NavLinks />
         </nav>

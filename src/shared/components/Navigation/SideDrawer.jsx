@@ -17,7 +17,7 @@ function SideDrawer(props) {
       mountOnEnter
       unmountOnExit
     >
-      <aside className="side-drawer">{props.children}</aside>
+      <aside className="side-drawer" onClick={props.onClick}>{props.children}</aside>
     </CSSTransition>
   )
   //this just ensures that when index.html loads, the sidedrawer html is loaded iun a better spot (above the 'root' where the main code is loaded)
