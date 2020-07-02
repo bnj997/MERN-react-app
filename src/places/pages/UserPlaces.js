@@ -29,8 +29,6 @@ function UserPlaces() {
       },
       creator: 'u2'
     }
-
-
   ]
 
   // useParams() stores the dynamic segments set by parent class
