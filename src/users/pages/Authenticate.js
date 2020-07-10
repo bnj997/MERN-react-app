@@ -11,79 +11,66 @@ import {
   VALIDATOR_REQUIRE
 } from '../../shared/util/validators';
 import { useForm } from '../../shared/hooks/form-hook';
+import { useHttpClient } from '../../shared/hooks/http-hook';
 import { AuthContext } from '../../shared/context/auth-context';
 import './Authenticate.css';
 
 
 function Authenticate() {
-    const auth = useContext(AuthContext);
-		const [isLogin, setIsLogin] = useState(true);
-		const [isLoading, setIsLoading] = useState(false);
-		const [error, setError] = useState();
-    const [formState, inputHandler, setFormData ] = useForm({
-        email: {
-            value: '',
-            isValid: false
-        },
-        password: {
-            value: '',
-            isValid: false
-        },
-    }, false)
+	const auth = useContext(AuthContext);
+	const [isLogin, setIsLogin] = useState(true);
+	const {isLoading, error, sendRequest, clearError} = useHttpClient();
+	const [formState, inputHandler, setFormData ] = useForm({
+			email: {
+					value: '',
+					isValid: false
+			},
+			password: {
+					value: '',
+					isValid: false
+			},
+	}, false)
 
-    async function authSubmit(event) {
-				event.preventDefault();
-
-				if (isLogin) {
-					try {
-						const response = await fetch('http://localhost:5000/api/users/login', {
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json'
-							},
-							body: JSON.stringify({
-								email: formState.inputs.email.value,
-								password: formState.inputs.password.value
-							})
-						}); 
-						const responseData = await response.json();
-						if (!response.ok) {
-							throw new Error(responseData.message);
-						}
-						setIsLoading(false);
-						auth.login();
-					} catch (err) {
-						console.log(err);
-						setIsLoading(false);
-						setError(err.message || 'Something went wrong, please try again.');
+	async function authSubmit(event) {
+		event.preventDefault();
+		if (isLogin) {
+			//use try block so auth.login only runs if no errors
+			try {
+				await sendRequest(
+					'http://localhost:5000/api/users/login', 
+					'POST', 
+					JSON.stringify({
+						email: formState.inputs.email.value,
+						password: formState.inputs.password.value
+					}),
+					{
+						'Content-Type': 'application/json'
+					},
+				); 
+				auth.login();
+			} catch (err) {
+				//dont put anythiung here since handled by hook
+			}
+		
+		} else {
+			try {
+				await sendRequest('http://localhost:5000/api/users/signup', 
+					'POST',  
+					JSON.stringify({
+						name: formState.inputs.name.value,
+						email: formState.inputs.email.value,
+						password: formState.inputs.password.value 
+					}),
+					{
+						'Content-Type': 'application/json'
 					}
-				} else {
-					try {
-						setIsLoading(true);
-						const response = await fetch('http://localhost:5000/api/users/signup', {
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json'
-							},
-							body: JSON.stringify({
-								name: formState.inputs.name.value,
-								email: formState.inputs.email.value,
-								password: formState.inputs.password.value
-							})
-						}); 
-						const responseData = await response.json();
-						if (!response.ok) {
-							throw new Error(responseData.message);
-						}
-						setIsLoading(false);
-						auth.login();
-					} catch (err) {
-						console.log(err);
-						setIsLoading(false);
-						setError(err.message || 'Something went wrong, please try again.');
-					}
-				}
-    };
+			); 
+				auth.login();
+			} catch (err) {
+				//dont put anythiung here since handled by hook
+			}
+		}
+	};
 
     function switchMode() {
         if (!isLogin) {
@@ -109,13 +96,9 @@ function Authenticate() {
         setIsLogin(prevMode => !prevMode)
     };
 
-		function errorHandler() {
-			setError(null);
-		}
-
     return (
 			<React.Fragment>
-				<ErrorModal error={error} onClear={errorHandler}/>
+				<ErrorModal error={error} onClear={clearError}/>
 				<Card className="authentication">
 					{isLoading && <LoadingSpinner asOverlay/>}
             <h2>Login Required </h2>

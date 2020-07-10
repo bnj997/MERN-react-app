@@ -29,14 +29,22 @@ export function useHttpClient() {
         signal: httpAbortCtrl.signal
       });
       const responseData = await response.json();
+
+      //Want to clear the abort controllers that belongs to request that was just completed
+      activeRequests.current = activeRequests.current.filter(
+        reqCtrl => reqCtrl !== httpAbortCtrl
+      );
+
       if (!response.ok) {
         throw new Error(responseData.message);
       }
+      setIsLoading(false);
       return responseData;
     } catch(err) {
       setError(err.message);
+      setIsLoading(false);
+      throw err;
     }
-    setIsLoading(false);
   }, []);
 
   function clearError() {
