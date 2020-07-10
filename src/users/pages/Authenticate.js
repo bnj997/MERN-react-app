@@ -3,6 +3,8 @@ import React, { useState, useContext } from 'react';
 import Card from '../../shared/components/UIElements/Card';
 import Input from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
+import ErrorModal from '../../shared/components/UIElements/ErrorModal';
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
 import {
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
@@ -15,7 +17,9 @@ import './Authenticate.css';
 
 function Authenticate() {
     const auth = useContext(AuthContext);
-    const [isLogin, setIsLogin] = useState(true);
+		const [isLogin, setIsLogin] = useState(true);
+		const [isLoading, setIsLoading] = useState(false);
+		const [error, setError] = useState();
     const [formState, inputHandler, setFormData ] = useForm({
         email: {
             value: '',
@@ -27,10 +31,39 @@ function Authenticate() {
         },
     }, false)
 
-    function authSubmit(event) {
-        event.preventDefault();
-        auth.login();
-    }
+    async function authSubmit(event) {
+				event.preventDefault();
+
+				if (isLogin) {
+
+				} else {
+					try {
+						setIsLoading(true);
+						const response = await fetch('http://localhost:5000/api/users/signup', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify({
+								name: formState.inputs.name.value,
+								email: formState.inputs.email.value,
+								password: formState.inputs.password.value
+							})
+						}); 
+						const responseData = await response.json();
+						if (!response.ok) {
+							throw new Error(responseData.message);
+						}
+						console.log(responseData);
+						setIsLoading(false);
+						auth.login();
+					} catch (err) {
+						console.log(err);
+						setIsLoading(false);
+						setError(err.message || 'Something went wrong, please try again.');
+					}
+				}
+    };
 
     function switchMode() {
         if (!isLogin) {
@@ -56,8 +89,15 @@ function Authenticate() {
         setIsLogin(prevMode => !prevMode)
     };
 
+		function errorHandler() {
+			setError(null);
+		}
+
     return (
-        <Card className="authentication">
+			<React.Fragment>
+				<ErrorModal error={error} onClear={errorHandler}/>
+				<Card className="authentication">
+					{isLoading && <LoadingSpinner asOverlay/>}
             <h2>Login Required </h2>
             <hr />
             <form onSubmit={authSubmit}>
@@ -97,7 +137,8 @@ function Authenticate() {
             <Button inverse onClick={switchMode}>
                 SWITCH TO {isLogin ? 'SIGN UP' : 'LOGIN'}
             </Button>
-         </Card>
+        </Card>
+			</React.Fragment>
     )
 }
 
