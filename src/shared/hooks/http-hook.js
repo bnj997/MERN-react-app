@@ -12,6 +12,7 @@ export function useHttpClient() {
 
   //Use "useCallback" to avoid infinite loops
   //"useCallback" ensures this function never gets recreated when component that uses this hook re renders
+  //Avoid infinite loop - sendRequest recreated whenever hook reruns, and hook reruns whenever the component that uses hook reruns
   const sendRequest = useCallback(async (
     url,
     method = 'GET', 

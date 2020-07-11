@@ -18,13 +18,16 @@ import { AuthContext } from './shared/context/auth-context';
 //Path "/places/:placeId" must be below path="/places/new" since "new" is also interpretted as ":placeId" 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userId, setUserId] = useState(false);
 
-  const login = useCallback(() => {
+  const login = useCallback((uid) => {
     setIsLoggedIn(true);
+    setUserId(uid);
   }, [])
 
   const logout = useCallback(() => {
     setIsLoggedIn(false);
+    setUserId(null);
   }, [])
 
   let routes;
@@ -65,7 +68,7 @@ function App() {
 
   return (
     <AuthContext.Provider 
-      value={{isLoggedIn: isLoggedIn, login: login, logout: logout}}
+      value={{isLoggedIn: isLoggedIn, userId: userId, login: login, logout: logout}}
     >
       <Router>
         <MainNavigation />

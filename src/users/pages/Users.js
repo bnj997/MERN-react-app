@@ -3,43 +3,35 @@ import React, { useEffect, useState } from 'react'
 import UsersList from '../components/UsersList';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
+import { useHttpClient } from '../../shared/hooks/http-hook';
 
 function Users() {
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState();
+  const {isLoading, error, sendRequest, clearError} = useHttpClient();
   const [loadedUsers, setLoadedUsers] = useState();
 
+
+  //As soon as User.js renders, fetch() runs. But fetch() would also run on each rerender of page which happens when you get response and update list. Creates infinite loop
+  //UseEffect allows us to run code only when certain dependancies change
+  //if dependancies empty, only run once and never rerun
   useEffect(() => {
     //corresponds to -> router.get('/', usersControllers.getUsers ); 
     //No need to say its a get request since its a default.
-    async function sendRequest() {
-      setIsLoading(true);
+    async function fetchUsers() {
       try {
-        const response = await fetch('http://localhost:5000/api/users');
-        //You get back: 	res.json({users: users.map(user => user.toObject({ getters: true}))});
-        const responseData = await response.json();
-
-        if (!response.ok) {
-          throw new Error(responseData.message)
-        }
-
+        const responseData = await sendRequest('http://localhost:5000/api/users');
         setLoadedUsers(responseData.users);
       } catch(err) {
-        setError(err.message);
-      }
-      setIsLoading(false);
-    };
-    sendRequest();
-  }, []);
 
-  function errorHandler() {
-    setError(null);
-  }
+      }
+    };
+    fetchUsers();
+  }, [sendRequest]);
+
 
   return (
     <React.Fragment>
-      <ErrorModal error={error} onClear={errorHandler} />
+      <ErrorModal error={error} onClear={clearError} />
       {isLoading && (
         <div className="center">
           <LoadingSpinner />
