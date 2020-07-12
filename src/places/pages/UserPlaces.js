@@ -29,6 +29,12 @@ function UserPlaces() {
     fetchPlaces();
   }, [sendRequest, userId]);
 
+  function placeDelete(deletedPlaceId) {
+    setLoadedPlaces(prevPlaces => 
+      prevPlaces.filter(place => place.id !== deletedPlaceId)
+    );
+  }
+
 
   //note that empty arrays of loadedplaces are handled by PlaceList
   return (
@@ -39,7 +45,7 @@ function UserPlaces() {
           <LoadingSpinner />
         </div>
       )}
-      {!isLoading && loadedPlaces && <PlaceList items={loadedPlaces} />}
+      {!isLoading && loadedPlaces && <PlaceList items={loadedPlaces} onDeletePlace={placeDelete} />}
     </React.Fragment>
   )
 }
