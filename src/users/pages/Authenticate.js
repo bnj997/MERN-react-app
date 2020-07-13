@@ -65,7 +65,7 @@ function Authenticate() {
 					'POST',  
 					formData,
 				); 
-				
+
 				auth.login(responseData.user.id);
 			} catch (err) {
 				//dont put anythiung here since handled by hook
@@ -121,7 +121,14 @@ function Authenticate() {
 							onInput={inputHandler}
 						/>
 						)}
-					{!isLogin && <ImageUpload center id="image" onInput={inputHandler}/>}
+					{!isLogin && (
+						<ImageUpload 
+							center 
+							id="image" 
+							onInput={inputHandler} 
+							errorText="Please provide an image."
+						/>
+					)}
 						<Input 
 							id="email" 
 							element="input"
