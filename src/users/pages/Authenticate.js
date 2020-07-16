@@ -48,7 +48,7 @@ function Authenticate() {
 						'Content-Type': 'application/json'
 					},
 				); 
-				auth.login(responseData.user.id);
+				auth.login(responseData.userId, responseData.token);
 			} catch (err) {
 				//dont put anythiung here since handled by hook
 			}
@@ -66,7 +66,7 @@ function Authenticate() {
 					formData,
 				); 
 
-				auth.login(responseData.user.id);
+				auth.login(responseData.userId, responseData.token);
 			} catch (err) {
 				//dont put anythiung here since handled by hook
 			}
