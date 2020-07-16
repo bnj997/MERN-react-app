@@ -55,7 +55,10 @@ function NewPlace() {
       await sendRequest(
         'http://localhost:5000/api/places', 
         'POST', 
-        formData
+        formData, 
+        {
+          Authorization: 'Bearer ' + auth.token
+        }
       );
       //Goes back to the starting page 
       history.push('/');
